@@ -18,3 +18,49 @@ const getUniqueData = (data) => {
             e.cmatId === item.cmatId && e.domainName === item.domainName && e.partyType === item.partyType
         )));
 }
+const strToJSON = (str) => {
+    let responseData = {
+            resultData: [],
+            validHeaders: [],
+            inValidHeaders: []
+        };
+if (str) {
+                let numberOfLineBreaks = (str.match(/\n/g) || []).length;
+                console.log(numberOfLineBreaks);
+                // let arr = str.split('\r\n');
+                let arr = str.split(/\r\n/g);
+                let keyArr = [];
+                let keyHeader = arr[0].split('|');
+                keyHeader.forEach(k => {
+                    if (fileKeyObj[k.trim().toLowerCase()]) {
+                        responseData.validHeaders.push(k.trim().toLowerCase());
+                    } else {
+                        responseData.inValidHeaders.push(k.trim());
+                    }
+                });
+                if (responseData.inValidHeaders.length) {
+                    return responseData;
+                } else {
+                    arr.forEach((e, i) => {
+                        if (e.length) {
+                            let tempArr = e.split('|');
+                            if (i === 0) {
+                                keyArr = tempArr
+                            } else {
+                                let tempObj = {};
+                                keyArr.forEach((v, j) => {
+                                    let k = v.toLowerCase();
+                                    if (fileKeyObj[k]) {
+                                        tempObj[fileKeyObj[k]] = tempArr[j];
+                                    } else {
+                                        tempObj[v] = tempArr[j];
+                                    }
+                                })
+                                responseData.resultData.push(tempObj);
+                            }
+                        }
+                    });
+                    return responseData;
+                }
+            }
+}
